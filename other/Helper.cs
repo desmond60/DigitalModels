@@ -73,6 +73,12 @@ public static class Helper
         return I / (2.0 * PI * sigma) * diff;
     }
 
+    //* Расчет diff потенциала
+    public static double diff_potential(Source A, Source B, Receiver M, Receiver N, double I) {
+        double diff = (1 / interval(M, B) - 1 / interval(M, A)) - (1 / interval(N, B) - 1 / interval(N, A));
+        return -I / (2.0 * PI * sigma * sigma) * diff;
+    }
+
     //* Расчет суммарного потенциала (1 приемник от 3 источников)
     public static double summPotential(Source[] sources, Receiver receiver, Receiver next_receiver, Vector<double> I) {
         double v1 = potential(sources[0], sources[1], receiver, next_receiver, I[0]);

@@ -16,9 +16,8 @@ public class Solve {
 
         // Считаем сумму потенциалов и находим omega
         Vector<double> V_fact = new Vector<double>(3);
-        V_fact[0] = summPotential(Sources, Receivers[0], Receivers[1], Absolut_I);
-        V_fact[1] = summPotential(Sources, Receivers[2], Receivers[3], Absolut_I);
-        V_fact[2] = summPotential(Sources, Receivers[4], Receivers[5], Absolut_I);
+        for (int i = 0; i < V_fact.Length; i++)
+            V_fact[i] = summPotential(Sources, Receivers[2*i], Receivers[2*i + 1], Absolut_I);
 
         Function.omega = new Vector<double>(new[]{1 / V_fact[0], 1 / V_fact[1], 1 / V_fact[2]});
 
@@ -39,27 +38,26 @@ public class Solve {
     //* Регуляризация
     private void regularization(Matrix mat, Vector<double> vec, Vector<double> res) {
         double a_pred = 0, a_next = 1e-15;
-    
+
         // Находим значение (a) при котором СЛАУ решится
         do {
             for (int i = 0; i < vec.Length; i++) 
                 mat[i,i] = mat[i,i] - a_pred + a_next;
             a_pred = a_next;
-            a_next *= 1.2;
+            a_next *= 1.4;
         } while (!gauss.solve(mat, vec, res));
-
+        
         // Находим наилучшее значение (a)
-        double DISCREPANCY = Discrepancy(mat, vec, a_pred);
-        double CURRENT_DISCREPANCY;
-        a_next = a_pred * 1.2;
+        double CURRENT_DISCREPANCY = Discrepancy(mat, vec, a_pred);
+        a_next = a_pred * 1.4;
 
         do {
             for (int i = 0; i < vec.Length; i++) 
                 mat[i,i] = mat[i,i] - a_pred + a_next;
             CURRENT_DISCREPANCY = Discrepancy(mat, vec, a_next);
             a_pred = a_next;
-            a_next *= 1.2;
-        } while (CURRENT_DISCREPANCY / DISCREPANCY < 2.0);
+            a_next *= 1.4;
+        } while (CURRENT_DISCREPANCY < 1e-15);
     }
 
     //* Вычисление невязки
@@ -89,8 +87,8 @@ public class Solve {
                 for (int k = 0; k < 3; k++) {
                     // Вычислим аналитические производные
                     // Положим I_init = 1
-                    double diff_i = potential(Sources[2*i], Sources[2*i + 1], Receivers[2*k], Receivers[2*k + 1], 1.0);
-                    double diff_j = potential(Sources[2*j], Sources[2*j + 1], Receivers[2*k], Receivers[2*k + 1], 1.0);
+                    double diff_i = diff_potential(Sources[2*i], Sources[2*i + 1], Receivers[2*k], Receivers[2*k + 1], sigma);
+                    double diff_j = diff_potential(Sources[2*j], Sources[2*j + 1], Receivers[2*k], Receivers[2*k + 1], sigma);
                     mat[i,j] += Pow(omega[k], 2) * diff_i * diff_j;
                 }
         return mat;
@@ -102,9 +100,9 @@ public class Solve {
 
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++) {
-                double diff = potential(Sources[2*i], Sources[2*i + 1], Receivers[2*j], Receivers[2*j + 1], 1.0);
+                double diff = diff_potential(Sources[2*i], Sources[2*i + 1], Receivers[2*j], Receivers[2*j + 1], sigma);
                 double V_current = summPotential(Sources, Receivers[2*j], Receivers[2*j + 1], I_init);
-                vec[i] -= Pow(omega[j], 2) * diff * (V_current - V_fact[j]);
+                vec[i] += Pow(omega[j], 2) * diff * (V_current - V_fact[j]);
             }
         return vec;
     }

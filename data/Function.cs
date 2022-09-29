@@ -16,7 +16,7 @@ public static class Function
                 sigma     = 0.1;          
                 Absolut_I = new Vector<double>(new []{1.0, 2.0, 3.0});
                 omega     = new Vector<double>(3);
-                I_init    = new Vector<double>(new []{1.0, 1.0, 1.0});
+                I_init    = new Vector<double>(new []{0.1, 0.1, 0.1});
             break;
         }
     }

@@ -18,7 +18,7 @@ public class Gauss {
     public bool solve(Matrix matrix, Vector<double> vector, Vector<double> res) {
         Matrix.Copy(matrix, mat);
         Vector<double>.Copy(vector, vec);
-
+        
         for (int i = 0; i < N; i++) {
             
             // Ищем максимальный элемент

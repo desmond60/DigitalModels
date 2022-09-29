@@ -13,6 +13,7 @@
     // Определение функции
     Function.Init(data.N);
 
+    // Решение обратной задачи
     Solve task = new Solve(data);
     task.solve();
 }
