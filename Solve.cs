@@ -32,7 +32,12 @@ public class Solve {
         if (!gauss.solve(matrix, vector, result)) 
             regularization(matrix, vector, result);
         
-        WriteLine(result.ToString());
+        //WriteLine(result + I_init);
+        Vector<double> V_res = new Vector<double>(result.Length);
+        for (int i = 0; i < result.Length; i++)
+            V_res[i] = summPotential(Sources, Receivers[2*i], Receivers[2*i + 1], (result + I_init));
+
+        WriteLine((V_res - V_fact).ToString());
     }
 
     //* Регуляризация
